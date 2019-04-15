@@ -38,11 +38,11 @@ service TemplateService {
  */
 // ############ REQUEST ############
 message TestRequest {
-  OnlineConsultant.RequestHeader header = 1;
+  gotp.RequestHeader header = 1;
   TestRequestData data = 2;
 }
 message TestResponse {
-  OnlineConsultant.ResponseHeader header = 1;
+  gotp.ResponseHeader header = 1;
   TestResponseData data = 2;
 }
 message TestRequestData {
