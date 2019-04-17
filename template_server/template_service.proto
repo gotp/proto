@@ -18,32 +18,33 @@ syntax = "proto3";
 
 package gotp.TemplateServer;
 
-import "github.com/gotp/proto/header.proto";
+import "github.com/gotp/proto/common.proto";
+import "github.com/gotp/proto/retcode.proto";
 
 // Interface exported by the server.
 service TemplateService {
-  /* 
-	 * !!!!!!!!!!!! WARNING !!!!!!!!!!!!
-	 * Please not remove or modify comment 
-	 * below, it's anchor for new code
-	 */
-	// ############ INTERFACE ############
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  // Please not remove or modify comment below, it's anchor for new code
+  // ########################### INTERFACE #############################
   rpc Test(TestRequest) returns (TestResponse) {}
 }
 
-/* 
- * !!!!!!!!!!!! WARNING !!!!!!!!!!!!
- * Please not remove or modify comment 
- * below, it's anchor for new code
- */
-// ############ REQUEST ############
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Please not remove or modify comment below, it's anchor for new code
+// ############################# REQUEST #############################
 message TestRequest {
-  gotp.RequestHeader header = 1;
-  TestRequestData data = 2;
+  string requestId = 1; //请求id
+  string clientId = 2; ///设备id
+  ClientType clientType = 3; //来源
+  string version = 4; //版本号x.y.z，与请求url中的版本不同，此版本为业务协议版本
+  bool testFlag = 5; //测试标志位
+  TestRequestData data = 6;
 }
 message TestResponse {
-  gotp.ResponseHeader header = 1;
-  TestResponseData data = 2;
+  RetcodeType retcode = 1; //业务返回码
+  string retmsg = 2; //业务返回消息
+  string requestId = 3; //请求id
+  TestResponseData data = 4;
 }
 message TestRequestData {
   // Define data field here

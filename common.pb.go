@@ -54,69 +54,298 @@ func (ClientType) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_555bd8c177793206, []int{0}
 }
 
-type RetcodeType int32
-
-const (
-	//------------ common ---------------
-	RetcodeType_RetSuccess RetcodeType = 0
-	//------------ system 4xxxxx ---------------
-	RetcodeType_RetUnknowError RetcodeType = 400001
-	RetcodeType_RetBadRequest  RetcodeType = 400400
-	RetcodeType_RetNotFound    RetcodeType = 400404
-	RetcodeType_RetServerError RetcodeType = 400504
-	//------------- access 5xxxxx --------
-	RetcodeType_RetServerUnreachable RetcodeType = 500504
-)
-
-var RetcodeType_name = map[int32]string{
-	0:      "RetSuccess",
-	400001: "RetUnknowError",
-	400400: "RetBadRequest",
-	400404: "RetNotFound",
-	400504: "RetServerError",
-	500504: "RetServerUnreachable",
+// AccessServer可识别header，用于外部请求
+type AccessRequestHeader struct {
+	//设备id
+	ClientId string `protobuf:"bytes,1,opt,name=clientId,proto3" json:"clientId,omitempty"`
+	//来源
+	ClientType ClientType `protobuf:"varint,2,opt,name=clientType,proto3,enum=gotp.ClientType" json:"clientType,omitempty"`
+	//版本号x.y.z，与请求url中的版本不同，此版本为业务协议版本
+	Version string `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	//token
+	Token                string   `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-var RetcodeType_value = map[string]int32{
-	"RetSuccess":           0,
-	"RetUnknowError":       400001,
-	"RetBadRequest":        400400,
-	"RetNotFound":          400404,
-	"RetServerError":       400504,
-	"RetServerUnreachable": 500504,
+func (m *AccessRequestHeader) Reset()         { *m = AccessRequestHeader{} }
+func (m *AccessRequestHeader) String() string { return proto.CompactTextString(m) }
+func (*AccessRequestHeader) ProtoMessage()    {}
+func (*AccessRequestHeader) Descriptor() ([]byte, []int) {
+	return fileDescriptor_555bd8c177793206, []int{0}
 }
 
-func (x RetcodeType) String() string {
-	return proto.EnumName(RetcodeType_name, int32(x))
+func (m *AccessRequestHeader) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AccessRequestHeader.Unmarshal(m, b)
+}
+func (m *AccessRequestHeader) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AccessRequestHeader.Marshal(b, m, deterministic)
+}
+func (m *AccessRequestHeader) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AccessRequestHeader.Merge(m, src)
+}
+func (m *AccessRequestHeader) XXX_Size() int {
+	return xxx_messageInfo_AccessRequestHeader.Size(m)
+}
+func (m *AccessRequestHeader) XXX_DiscardUnknown() {
+	xxx_messageInfo_AccessRequestHeader.DiscardUnknown(m)
 }
 
-func (RetcodeType) EnumDescriptor() ([]byte, []int) {
+var xxx_messageInfo_AccessRequestHeader proto.InternalMessageInfo
+
+func (m *AccessRequestHeader) GetClientId() string {
+	if m != nil {
+		return m.ClientId
+	}
+	return ""
+}
+
+func (m *AccessRequestHeader) GetClientType() ClientType {
+	if m != nil {
+		return m.ClientType
+	}
+	return ClientType_Reserve
+}
+
+func (m *AccessRequestHeader) GetVersion() string {
+	if m != nil {
+		return m.Version
+	}
+	return ""
+}
+
+func (m *AccessRequestHeader) GetToken() string {
+	if m != nil {
+		return m.Token
+	}
+	return ""
+}
+
+type AccessResponseHeader struct {
+	//业务返回码
+	Retcode int32 `protobuf:"varint,1,opt,name=retcode,proto3" json:"retcode,omitempty"`
+	//业务返回消息
+	Retmsg string `protobuf:"bytes,2,opt,name=retmsg,proto3" json:"retmsg,omitempty"`
+	//请求id
+	RequestId            string   `protobuf:"bytes,3,opt,name=requestId,proto3" json:"requestId,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AccessResponseHeader) Reset()         { *m = AccessResponseHeader{} }
+func (m *AccessResponseHeader) String() string { return proto.CompactTextString(m) }
+func (*AccessResponseHeader) ProtoMessage()    {}
+func (*AccessResponseHeader) Descriptor() ([]byte, []int) {
 	return fileDescriptor_555bd8c177793206, []int{1}
+}
+
+func (m *AccessResponseHeader) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AccessResponseHeader.Unmarshal(m, b)
+}
+func (m *AccessResponseHeader) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AccessResponseHeader.Marshal(b, m, deterministic)
+}
+func (m *AccessResponseHeader) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AccessResponseHeader.Merge(m, src)
+}
+func (m *AccessResponseHeader) XXX_Size() int {
+	return xxx_messageInfo_AccessResponseHeader.Size(m)
+}
+func (m *AccessResponseHeader) XXX_DiscardUnknown() {
+	xxx_messageInfo_AccessResponseHeader.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AccessResponseHeader proto.InternalMessageInfo
+
+func (m *AccessResponseHeader) GetRetcode() int32 {
+	if m != nil {
+		return m.Retcode
+	}
+	return 0
+}
+
+func (m *AccessResponseHeader) GetRetmsg() string {
+	if m != nil {
+		return m.Retmsg
+	}
+	return ""
+}
+
+func (m *AccessResponseHeader) GetRequestId() string {
+	if m != nil {
+		return m.RequestId
+	}
+	return ""
+}
+
+// 用于内部RPC请求
+type RequestHeader struct {
+	//请求id
+	RequestId string `protobuf:"bytes,1,opt,name=requestId,proto3" json:"requestId,omitempty"`
+	//设备id
+	ClientId string `protobuf:"bytes,2,opt,name=clientId,proto3" json:"clientId,omitempty"`
+	//来源
+	ClientType int32 `protobuf:"varint,3,opt,name=clientType,proto3" json:"clientType,omitempty"`
+	//版本号x.y.z，与请求url中的版本不同，此版本为业务协议版本
+	Version string `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
+	//测试标志位
+	TestFlag             bool     `protobuf:"varint,5,opt,name=testFlag,proto3" json:"testFlag,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *RequestHeader) Reset()         { *m = RequestHeader{} }
+func (m *RequestHeader) String() string { return proto.CompactTextString(m) }
+func (*RequestHeader) ProtoMessage()    {}
+func (*RequestHeader) Descriptor() ([]byte, []int) {
+	return fileDescriptor_555bd8c177793206, []int{2}
+}
+
+func (m *RequestHeader) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_RequestHeader.Unmarshal(m, b)
+}
+func (m *RequestHeader) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_RequestHeader.Marshal(b, m, deterministic)
+}
+func (m *RequestHeader) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RequestHeader.Merge(m, src)
+}
+func (m *RequestHeader) XXX_Size() int {
+	return xxx_messageInfo_RequestHeader.Size(m)
+}
+func (m *RequestHeader) XXX_DiscardUnknown() {
+	xxx_messageInfo_RequestHeader.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RequestHeader proto.InternalMessageInfo
+
+func (m *RequestHeader) GetRequestId() string {
+	if m != nil {
+		return m.RequestId
+	}
+	return ""
+}
+
+func (m *RequestHeader) GetClientId() string {
+	if m != nil {
+		return m.ClientId
+	}
+	return ""
+}
+
+func (m *RequestHeader) GetClientType() int32 {
+	if m != nil {
+		return m.ClientType
+	}
+	return 0
+}
+
+func (m *RequestHeader) GetVersion() string {
+	if m != nil {
+		return m.Version
+	}
+	return ""
+}
+
+func (m *RequestHeader) GetTestFlag() bool {
+	if m != nil {
+		return m.TestFlag
+	}
+	return false
+}
+
+type ResponseHeader struct {
+	//业务返回码
+	Retcode int32 `protobuf:"varint,1,opt,name=retcode,proto3" json:"retcode,omitempty"`
+	//业务返回消息
+	Retmsg string `protobuf:"bytes,2,opt,name=retmsg,proto3" json:"retmsg,omitempty"`
+	//请求id
+	RequestId            string   `protobuf:"bytes,3,opt,name=requestId,proto3" json:"requestId,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ResponseHeader) Reset()         { *m = ResponseHeader{} }
+func (m *ResponseHeader) String() string { return proto.CompactTextString(m) }
+func (*ResponseHeader) ProtoMessage()    {}
+func (*ResponseHeader) Descriptor() ([]byte, []int) {
+	return fileDescriptor_555bd8c177793206, []int{3}
+}
+
+func (m *ResponseHeader) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ResponseHeader.Unmarshal(m, b)
+}
+func (m *ResponseHeader) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ResponseHeader.Marshal(b, m, deterministic)
+}
+func (m *ResponseHeader) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ResponseHeader.Merge(m, src)
+}
+func (m *ResponseHeader) XXX_Size() int {
+	return xxx_messageInfo_ResponseHeader.Size(m)
+}
+func (m *ResponseHeader) XXX_DiscardUnknown() {
+	xxx_messageInfo_ResponseHeader.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ResponseHeader proto.InternalMessageInfo
+
+func (m *ResponseHeader) GetRetcode() int32 {
+	if m != nil {
+		return m.Retcode
+	}
+	return 0
+}
+
+func (m *ResponseHeader) GetRetmsg() string {
+	if m != nil {
+		return m.Retmsg
+	}
+	return ""
+}
+
+func (m *ResponseHeader) GetRequestId() string {
+	if m != nil {
+		return m.RequestId
+	}
+	return ""
 }
 
 func init() {
 	proto.RegisterEnum("gotp.ClientType", ClientType_name, ClientType_value)
-	proto.RegisterEnum("gotp.RetcodeType", RetcodeType_name, RetcodeType_value)
+	proto.RegisterType((*AccessRequestHeader)(nil), "gotp.AccessRequestHeader")
+	proto.RegisterType((*AccessResponseHeader)(nil), "gotp.AccessResponseHeader")
+	proto.RegisterType((*RequestHeader)(nil), "gotp.RequestHeader")
+	proto.RegisterType((*ResponseHeader)(nil), "gotp.ResponseHeader")
 }
 
 func init() { proto.RegisterFile("common.proto", fileDescriptor_555bd8c177793206) }
 
 var fileDescriptor_555bd8c177793206 = []byte{
-	// 246 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x49, 0xce, 0xcf, 0xcd,
-	0xcd, 0xcf, 0xd3, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x49, 0xcf, 0x2f, 0x29, 0xd0, 0x8a,
-	0xe7, 0xe2, 0x72, 0xce, 0xc9, 0x4c, 0xcd, 0x2b, 0x09, 0xa9, 0x2c, 0x48, 0x15, 0xe2, 0xe6, 0x62,
-	0x0f, 0x4a, 0x2d, 0x4e, 0x2d, 0x2a, 0x4b, 0x15, 0x60, 0x10, 0xe2, 0xe5, 0xe2, 0xf0, 0x30, 0x85,
-	0x48, 0x0a, 0x4c, 0xf4, 0x13, 0x12, 0xe3, 0x12, 0xf4, 0xcd, 0xcc, 0xcb, 0x0c, 0x28, 0xca, 0x4f,
-	0x2f, 0x4a, 0xcc, 0x85, 0x8a, 0x4f, 0xf2, 0x03, 0x29, 0xf3, 0x0d, 0x80, 0x72, 0x27, 0xfb, 0x09,
-	0xf1, 0x71, 0x71, 0x3a, 0x06, 0xc0, 0xf8, 0x53, 0xfc, 0xb4, 0x7a, 0x19, 0xb9, 0xb8, 0x83, 0x52,
-	0x4b, 0x92, 0xf3, 0x53, 0x52, 0xc1, 0x56, 0xf0, 0x71, 0x71, 0x05, 0xa5, 0x96, 0x04, 0x97, 0x26,
-	0x27, 0xa7, 0x16, 0x17, 0x0b, 0x30, 0x08, 0x89, 0x70, 0xf1, 0x05, 0xa5, 0x96, 0x84, 0xe6, 0x65,
-	0xe7, 0xe5, 0x97, 0xbb, 0x16, 0x15, 0xe5, 0x17, 0x09, 0x34, 0x6e, 0x95, 0x10, 0x12, 0xe6, 0xe2,
-	0x0d, 0x4a, 0x2d, 0x71, 0x4a, 0x4c, 0x09, 0x4a, 0x2d, 0x2c, 0x4d, 0x2d, 0x2e, 0x11, 0x98, 0xb0,
-	0x43, 0x42, 0x48, 0x10, 0x6c, 0x92, 0x5f, 0x7e, 0x89, 0x5b, 0x7e, 0x69, 0x5e, 0x8a, 0xc0, 0x94,
-	0x1d, 0x12, 0x50, 0xdd, 0xc1, 0x20, 0x17, 0x17, 0x41, 0x74, 0xff, 0xd8, 0x21, 0x21, 0x24, 0xc5,
-	0x25, 0x02, 0x17, 0x0d, 0xcd, 0x2b, 0x4a, 0x4d, 0x4c, 0xce, 0x48, 0x4c, 0xca, 0x49, 0x15, 0x98,
-	0x71, 0x4c, 0x2e, 0x89, 0x0d, 0xec, 0x7b, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0xdd, 0x21,
-	0x90, 0xa5, 0x0d, 0x01, 0x00, 0x00,
+	// 325 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x92, 0xcd, 0x4a, 0xfb, 0x40,
+	0x14, 0xc5, 0xff, 0xd3, 0xcf, 0xe4, 0xfe, 0x6d, 0xa9, 0x63, 0x29, 0x43, 0x11, 0x29, 0x59, 0x15,
+	0x17, 0x45, 0x14, 0x1f, 0xa0, 0x08, 0xd2, 0x2e, 0x1a, 0xca, 0xe0, 0x5e, 0x6b, 0x72, 0x0d, 0xc1,
+	0x66, 0x26, 0xce, 0x8c, 0x05, 0x1f, 0x43, 0xeb, 0xde, 0x57, 0x95, 0x4e, 0x3e, 0x6a, 0x0a, 0x2e,
+	0xdd, 0xe5, 0x77, 0x72, 0xb8, 0x73, 0xee, 0x99, 0x81, 0xa3, 0x40, 0x26, 0x89, 0x14, 0x93, 0x54,
+	0x49, 0x23, 0x69, 0x23, 0x92, 0x26, 0xf5, 0xb6, 0x04, 0x4e, 0xa6, 0x41, 0x80, 0x5a, 0x73, 0x7c,
+	0x79, 0x45, 0x6d, 0x66, 0xb8, 0x0a, 0x51, 0xd1, 0x21, 0x38, 0xc1, 0x3a, 0x46, 0x61, 0xe6, 0x21,
+	0x23, 0x23, 0x32, 0x76, 0x79, 0xc9, 0xf4, 0x02, 0x20, 0xfb, 0xbe, 0x7b, 0x4b, 0x91, 0xd5, 0x46,
+	0x64, 0xdc, 0xbd, 0xec, 0x4d, 0x76, 0xe3, 0x26, 0x37, 0xa5, 0xce, 0x7f, 0x78, 0x28, 0x83, 0xf6,
+	0x06, 0x95, 0x8e, 0xa5, 0x60, 0x75, 0x3b, 0xac, 0x40, 0xda, 0x87, 0xa6, 0x91, 0xcf, 0x28, 0x58,
+	0xc3, 0xea, 0x19, 0x78, 0x4f, 0xd0, 0x2f, 0x42, 0xe9, 0x54, 0x0a, 0x8d, 0x79, 0x2a, 0x06, 0x6d,
+	0x85, 0x26, 0x90, 0x21, 0xda, 0x50, 0x4d, 0x5e, 0x20, 0x1d, 0x40, 0x4b, 0xa1, 0x49, 0x74, 0x64,
+	0xf3, 0xb8, 0x3c, 0x27, 0x7a, 0x0a, 0xae, 0xca, 0x16, 0x9b, 0x87, 0xf9, 0xd9, 0x7b, 0xc1, 0xfb,
+	0x22, 0xd0, 0xa9, 0xee, 0x5d, 0xf1, 0x93, 0x03, 0x7f, 0xa5, 0x95, 0xda, 0x41, 0x2b, 0x67, 0x95,
+	0x56, 0xea, 0x36, 0xde, 0x2f, 0x1d, 0x34, 0xaa, 0x1d, 0x0c, 0xc1, 0x31, 0xa8, 0xcd, 0xed, 0x7a,
+	0x15, 0xb1, 0xe6, 0x88, 0x8c, 0x1d, 0x5e, 0xb2, 0xf7, 0x00, 0xdd, 0xbf, 0xed, 0xe0, 0xfc, 0x1e,
+	0x60, 0x7f, 0x6b, 0xf4, 0x3f, 0xb4, 0x39, 0x6a, 0x54, 0x1b, 0xec, 0xfd, 0xa3, 0x1d, 0x70, 0x66,
+	0xd7, 0xd9, 0xcf, 0xde, 0xbb, 0x4f, 0x07, 0x70, 0xbc, 0x88, 0x45, 0xbc, 0x54, 0x32, 0x52, 0xab,
+	0x24, 0xd7, 0x3f, 0xfc, 0x9d, 0x6d, 0xb1, 0xcc, 0x71, 0xeb, 0xd3, 0x2e, 0xb8, 0xd3, 0x65, 0xc1,
+	0x9f, 0xfe, 0x63, 0xcb, 0xbe, 0xb7, 0xab, 0xef, 0x00, 0x00, 0x00, 0xff, 0xff, 0x09, 0x57, 0x72,
+	0xd9, 0x7f, 0x02, 0x00, 0x00,
 }

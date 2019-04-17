@@ -18,22 +18,97 @@ syntax = "proto3";
 
 package gotp;
 
+/*
+  NOTE@20181117(gotp): 协议约定
+  1. 后台服务接口约定
+  (1) 接口原型: 
+    rpc XXX(XXXRequest) returns (XXXResponse)
+  (2) 命名约定:
+    a. 请求结构体和响应结构体分别在接口名后增加Request和Response
+  (3) 结构体定义:
+    a. Request和Response结构体分别由header和data两部分组成
+    message XXXRequest {
+      PROJECTNAME.RequestHeader header = 1; // 其中PROJECTNAME表示项目名，PROJECTNAME.RequestHeader表示项目定义的公共头
+      XXXRequestData data = 2;
+    };
+    b. data字段为空时可省略该字段
+  2. 前端接口约定
+  前端使用形如以下描述的HTTP请求访问后台接口
+  (1) URL: /cgi-bin/version/project/server/service/fucntion, 其中
+    version - 格式为vN，例如v1，表示接口版本，可用于区分接入层
+    project - 项目名称，proto文件中package字段的前半部分
+    server - 服务名，proto文件中package字段的后半部分
+    service - 对应proto文件中的service名称
+    function - 对应proto文件中service里定义的接口
+  (2) Content: JSON字符串，header-field对应接口中的header参数内容，data对应request中data字段
+      {
+        "header-field1": xxx,
+        "header-field2": xxx,
+        ......
+        "data": {
+          ......
+        }
+      }
+  (3) Response: JSON字符串，顶层json为header，内嵌data字段对应response
+      {
+          "retcode" : int,
+          "retmsg" : string,
+          "requestId": string,
+          ......
+          "data": {
+              ......
+          }
+      }
+*/
+
+// AccessServer可识别header，用于外部请求
+message AccessRequestHeader {
+  //设备id
+  string clientId = 1;
+  //来源
+  ClientType clientType = 2;
+  //版本号x.y.z，与请求url中的版本不同，此版本为业务协议版本
+  string version = 3;
+  //token
+  string token = 4;
+}
+    
+message AccessResponseHeader {
+  //业务返回码
+  int32 retcode = 1;
+  //业务返回消息
+  string retmsg = 2;
+  //请求id
+  string requestId = 3; 
+}
+
+// 用于内部RPC请求
+message RequestHeader {
+  //请求id
+  string requestId = 1;
+  //设备id
+  string clientId = 2;
+  //来源
+  int32 clientType = 3;
+  //版本号x.y.z，与请求url中的版本不同，此版本为业务协议版本
+  string version = 4;
+  //测试标志位
+  bool testFlag = 5;
+}
+    
+message ResponseHeader {
+  //业务返回码
+  int32 retcode = 1;
+  //业务返回消息
+  string retmsg = 2;
+  //请求id
+  string requestId = 3; 
+}
+
 enum ClientType {
   Reserve = 0;
   H5Client = 10001;            //普通H5
   MiniProgramClient = 10002;   //小程序
   MPClient = 10003;            //公众号
   APPClient = 10004;           //APP
-}
-
-enum RetcodeType {
-  //------------ common ---------------
-  RetSuccess = 0; //成功
-  //------------ system 4xxxxx ---------------
-  RetUnknowError = 400001;   //未知错误
-  RetBadRequest = 400400;    //请求格式错误
-  RetNotFound = 400404;      //请求地址不存在
-  RetServerError = 400504;   //请求后端服务错误
-  //------------- access 5xxxxx --------
-  RetServerUnreachable = 500504;   //后端服务不可达
 }
